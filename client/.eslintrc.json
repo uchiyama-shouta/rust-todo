@@ -1,0 +1,70 @@
+{
+  // "plugins": ["tailwindcss"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:tailwindcss/recommended",
+    "next/core-web-vitals",
+    "prettier"
+  ],
+  "settings": {
+    "tailwindcss": {
+      "callees": ["classnames", "classcat", "clsx", "ctl"],
+      "cssFilesRefreshRate": 5000,
+      "groupByResponsive": false,
+      "whitelist": []
+    }
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-arrow-callback": "error",
+    "prefer-const": "error",
+    "func-style": ["error", "expression"],
+    "react/react-in-jsx-scope": "off",
+    "react/display-name": "error",
+    "react/jsx-handler-names": [
+      "error",
+      {
+        "eventHandlerPrefix": "handle",
+        "eventHandlerPropPrefix": "on",
+        "checkLocalVariables": true,
+        "checkInlineFunction": true
+      }
+    ],
+
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "{react,react-dom/**,next/**}",
+            "group": "builtin",
+            "position": "before"
+          },
+          {
+            "pattern": "src/**",
+            "group": "parent",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "alphabetize": {
+          "order": "asc"
+        },
+        "newlines-between": "always"
+      }
+    ],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports" }
+    ]
+  }
+}
