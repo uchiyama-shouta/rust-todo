@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   db:
@@ -9,11 +9,23 @@ services:
       MYSQL_DATABASE: test_database
       MYSQL_USER: docker
       MYSQL_PASSWORD: docker
-      TZ: 'Asia/Tokyo'
+      TZ: "Asia/Tokyo"
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-    - ./docker/db/data:/var/lib/mysql
-    - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-    - ./docker/db/sql:/docker-entrypoint-initdb.d
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
     ports:
-    - 3306:3306
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS='db'
+    ports:
+      - "3000:80"
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
