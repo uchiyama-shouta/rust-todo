@@ -1,8 +1,8 @@
 use axum::{
-    extract::{Json},
+    extract::{Json,Path},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, put},
     Extension, Router,
 };
 
@@ -23,15 +23,16 @@ struct CreateTodo {
     title: String,
 }
 
+#[derive(Debug, Deserialize)]
+struct UpdateTodo {
+    title: String,
+    is_complete: bool,
+}
+
 pub fn create_route() -> Router {
     Router::new()
         .route("/", get(get_todos).post(create_todos))
-    // .route(
-    //     "/:id",
-    //     get(get_todo_item())
-    //         .put(uapdate_todos())
-    //         .delete(delete_todos()),
-    // )
+        .route("/:id", put(update_todos).delete(delete_todos))
 }
 
 async fn get_todos(db: Database) -> AppJsonResult<Vec<todo::Data>> {
@@ -43,8 +44,25 @@ async fn create_todos(db: Database, Json(input): Json<CreateTodo>) -> AppJsonRes
     let data = db.todo().create(input.title, false, vec![]).exec().await?;
     Ok(Json::from(data))
 }
-// async fn uapdate_todos() {}
-// async fn delete_todos() {}
+
+async fn update_todos(db: Database, Path(id): Path<i32>, Json(input): Json<UpdateTodo>) -> AppJsonResult<todo::Data> {
+    let data = db
+        .todo()
+        .update(
+            todo::id::equals(id),
+            vec![
+                todo::title::set(input.title),
+                todo::is_complete::set(input.is_complete),
+            ],
+        )
+        .exec()
+        .await?;
+    Ok(Json::from(data))
+}
+async fn delete_todos(db: Database, Path(id): Path<i32>) -> AppResult<StatusCode> {
+    db.todo().delete(todo::id::equals(id)).exec().await?;
+    Ok(StatusCode::OK)
+}
 
 enum AppError {
     PrismaError(QueryError),
@@ -60,7 +78,6 @@ impl From<QueryError> for AppError {
     }
 }
 
-// This centralizes all differents errors from our app in one place
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let status = match self {
