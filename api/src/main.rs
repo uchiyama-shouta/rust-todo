@@ -1,13 +1,11 @@
 use std::net::SocketAddr;
+use std::sync::Arc;
 
-use axum::{
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
-};
+use axum::{extract::Extension, routing::get, Router};
+use dotenv::dotenv;
 
 pub mod prisma;
+mod todos;
 
 // - `GET /todos`: return a JSON list of Todos.
 // - `GET /todos:id`: return a JSON list of Todos.
@@ -16,18 +14,26 @@ pub mod prisma;
 // - `DELETE /todos/:id`: delete a specific Todo.
 
 async fn handler() -> &'static str {
-    "Hello, World!"
+    "Hello, World!!!"
 }
 
 const PORT: u16 = 8000;
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(handler));
+    #[cfg(debug_assertions)]
+    dotenv().ok();
+    let prisma_client = Arc::new(prisma::new_client().await.expect("DB not found!"));
+    let app = Router::new()
+        .route("/", get(handler))
+        .nest("/todos", todos::create_route())
+        .layer(Extension(prisma_client));
     let addr = SocketAddr::from(([127, 0, 0, 1], PORT));
+
     println!("http:localhost:{}", PORT);
+
     axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    .serve(app.into_make_service())
+    .await
+    .unwrap();
 }

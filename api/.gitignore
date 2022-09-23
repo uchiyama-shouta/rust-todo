@@ -1,2 +1,4 @@
 src/prisma.rs
 target/
+docker
+.env

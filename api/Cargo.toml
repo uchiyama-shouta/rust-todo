@@ -13,3 +13,4 @@ axum = "0.5.16"
 tokio = { version = "1.21.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 prisma-client-rust = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.1" }
+dotenv = "0.15.0"
