@@ -8,9 +8,8 @@ pub mod prisma;
 mod todos;
 
 // - `GET /todos`: return a JSON list of Todos.
-// - `GET /todos:id`: return a JSON list of Todos.
 // - `POST /todos`: create a new Todo.
-// - `PUT /todos/:id`: update a specific Todo.
+// - `PATCH /todos/:id`: update a specific Todo.
 // - `DELETE /todos/:id`: delete a specific Todo.
 
 async fn handler() -> &'static str {
